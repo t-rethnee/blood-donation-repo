@@ -1,48 +1,57 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { AuthContext } from "../../../provider/AuthProvider";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { 
-  FiUser, 
-  FiMapPin, 
-  FiCalendar, 
-  FiClock, 
+import {
+  FiUser,
+  FiMapPin,
+  FiCalendar,
+  FiClock,
   FiDroplet,
   FiEye,
   FiEdit2,
   FiTrash2,
   FiCheckCircle,
-  FiXCircle
+  FiXCircle,
 } from "react-icons/fi";
+
+import { useQuery } from "@tanstack/react-query";
 
 const DonorHome = () => {
   const { user } = useContext(AuthContext);
-  const [requests, setRequests] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user?.email) {
-      axios.get(`http://localhost:5000/api/donation-requests/by-donor/${user.email}`)
-        .then((res) => {
-          if (Array.isArray(res.data)) {
-            setRequests(res.data);
-          } else {
-            console.error("API returned non-array data:", res.data);
-            setRequests([]); 
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setRequests([]);
-        });
+  // React Query fetcher function
+  const fetchRequests = async () => {
+    if (!user?.email) return [];
+    const response = await axios.get(
+      `http://localhost:5000/api/donation-requests/by-donor/${user.email}`
+    );
+    if (Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      console.error("API returned non-array data:", response.data);
+      return [];
     }
-  }, [user]);
+  };
+
+  // useQuery with v5 syntax - pass a single object with keys: queryKey, queryFn, enabled
+  const {
+    data: requests = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["donationRequests", user?.email],
+    queryFn: fetchRequests,
+    enabled: !!user?.email,
+  });
 
   const handleStatusUpdate = async (id, status) => {
     try {
       const result = await axios.patch(
-        `http://localhost:5000/api/donation-requests/status/${id}`, 
+        `http://localhost:5000/api/donation-requests/status/${id}`,
         { status }
       );
       if (result.data.modifiedCount > 0) {
@@ -51,9 +60,9 @@ const DonorHome = () => {
           text: `Status updated to ${status}`,
           icon: "success",
           confirmButtonColor: "#10B981",
-          background: "#f8fafc"
+          background: "#f8fafc",
         });
-        setRequests(prev => prev.map(r => r._id === id ? { ...r, status } : r));
+        refetch();
       }
     } catch (err) {
       console.error(err);
@@ -62,7 +71,7 @@ const DonorHome = () => {
         text: "Failed to update status",
         icon: "error",
         confirmButtonColor: "#EF4444",
-        background: "#f8fafc"
+        background: "#f8fafc",
       });
     }
   };
@@ -76,7 +85,7 @@ const DonorHome = () => {
       confirmButtonColor: "#EF4444",
       cancelButtonColor: "#6B7280",
       confirmButtonText: "Yes, delete it!",
-      background: "#f8fafc"
+      background: "#f8fafc",
     });
 
     if (confirm.isConfirmed) {
@@ -90,9 +99,9 @@ const DonorHome = () => {
             text: "The request has been removed.",
             icon: "success",
             confirmButtonColor: "#10B981",
-            background: "#f8fafc"
+            background: "#f8fafc",
           });
-          setRequests(prev => prev.filter(r => r._id !== id));
+          refetch();
         }
       } catch (err) {
         console.error(err);
@@ -101,7 +110,7 @@ const DonorHome = () => {
           text: "Failed to delete request",
           icon: "error",
           confirmButtonColor: "#EF4444",
-          background: "#f8fafc"
+          background: "#f8fafc",
         });
       }
     }
@@ -109,33 +118,59 @@ const DonorHome = () => {
 
   const getStatusBadge = (status) => {
     const base = "px-2 py-1 rounded-full text-xs font-medium";
-    switch(status?.toLowerCase()) {
-      case 'pending':
-        return <span className={`${base} bg-yellow-100 text-yellow-800`}>Pending</span>;
-      case 'inprogress':
-        return <span className={`${base} bg-blue-100 text-blue-800`}>In Progress</span>;
-      case 'done':
-        return <span className={`${base} bg-green-100 text-green-800`}>Completed</span>;
-      case 'canceled':
-        return <span className={`${base} bg-gray-100 text-gray-800`}>Canceled</span>;
+    switch (status?.toLowerCase()) {
+      case "pending":
+        return (
+          <span className={`${base} bg-yellow-100 text-yellow-800`}>Pending</span>
+        );
+      case "inprogress":
+        return (
+          <span className={`${base} bg-blue-100 text-blue-800`}>In Progress</span>
+        );
+      case "done":
+        return (
+          <span className={`${base} bg-green-100 text-green-800`}>Completed</span>
+        );
+      case "canceled":
+        return (
+          <span className={`${base} bg-gray-100 text-gray-800`}>Canceled</span>
+        );
       default:
-        return <span className={`${base} bg-gray-100 text-gray-800`}>{status}</span>;
+        return (
+          <span className={`${base} bg-gray-100 text-gray-800`}>{status}</span>
+        );
     }
   };
 
   const getBloodGroupColor = (bloodGroup) => {
     const colors = {
-      'A+': 'bg-red-50 text-red-700 border border-red-200',
-      'A-': 'bg-red-100 text-red-800 border border-red-300',
-      'B+': 'bg-blue-50 text-blue-700 border border-blue-200',
-      'B-': 'bg-blue-100 text-blue-800 border border-blue-300',
-      'O+': 'bg-green-50 text-green-700 border border-green-200',
-      'O-': 'bg-green-100 text-green-800 border border-green-300',
-      'AB+': 'bg-purple-50 text-purple-700 border border-purple-200',
-      'AB-': 'bg-purple-100 text-purple-800 border border-purple-300',
+      "A+": "bg-red-50 text-red-700 border border-red-200",
+      "A-": "bg-red-100 text-red-800 border border-red-300",
+      "B+": "bg-blue-50 text-blue-700 border border-blue-200",
+      "B-": "bg-blue-100 text-blue-800 border border-blue-300",
+      "O+": "bg-green-50 text-green-700 border border-green-200",
+      "O-": "bg-green-100 text-green-800 border border-green-300",
+      "AB+": "bg-purple-50 text-purple-700 border border-purple-200",
+      "AB-": "bg-purple-100 text-purple-800 border border-purple-300",
     };
-    return colors[bloodGroup] || 'bg-gray-50 text-gray-700 border border-gray-200';
+    return colors[bloodGroup] || "bg-gray-50 text-gray-700 border border-gray-200";
   };
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-20 text-gray-500 font-semibold">
+        Loading your donation requests...
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="text-center py-20 text-red-500 font-semibold">
+        Error loading donation requests.
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -196,138 +231,109 @@ const DonorHome = () => {
                   <th className="px-4 py-3 text-left text-sm font-semibold text-red-700 uppercase tracking-wider min-w-[100px]">
                     Status
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-red-700 uppercase tracking-wider min-w-[150px]">
-                    Donor Info
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-red-700 uppercase tracking-wider min-w-[200px]">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-red-700 uppercase tracking-wider min-w-[140px]">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {requests.slice(0, 3).map((req) => {
-                  const status = req.status?.toLowerCase();
-                  const showDonorInfo = status === "inprogress" && req.donorName && req.donorEmail;
+              <tbody className="divide-y divide-gray-100">
+                {requests.slice(0, 3).map((req) => (
+                  <tr key={req._id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium">
+                      {req.recipientName}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                      {req.recipientDistrict}, {req.recipientUpazila}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                      {req.date}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                      {req.time}
+                    </td>
+                    <td
+                      className={`px-3 py-1 text-center text-sm font-semibold rounded-md ${getBloodGroupColor(
+                        req.bloodGroup
+                      )}`}
+                    >
+                      {req.bloodGroup}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {getStatusBadge(req.status)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap space-x-2">
+                      {/* Action buttons */}
+                      <button
+                        onClick={() =>
+                          navigate(`/dashboard/edit-donation-request/${req._id}`)
+                        }
+                        title="Edit Request"
+                        className="p-1 rounded hover:bg-gray-200 text-gray-700"
+                      >
+                        <FiEdit2 className="w-5 h-5" />
+                      </button>
 
-                  return (
-                    <tr key={req._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {req.recipientName}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm text-gray-700">
-                          {req.recipientUpazila}, {req.recipientDistrict}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm text-gray-700">
-                          {new Date(req.donationDate).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm text-gray-700">
-                          {req.donationTime}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`${getBloodGroupColor(req.bloodGroup)} px-2 py-1 rounded-full text-xs font-medium`}>
-                          {req.bloodGroup}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        {getStatusBadge(req.status)}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        {showDonorInfo ? (
-                          <div className="text-sm text-gray-700">
-                            <div className="font-medium">{req.requesterName}</div>
-                            <div className="text-gray-500 text-xs">{req.requesterEmail}</div>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-400">Not assigned</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-right">
-                        <div className="flex flex-wrap gap-2 justify-end">
-                          <Link
-                            to={`/dashboard/donation-requests/${req._id}`}
-                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                          >
-                            <FiEye className="mr-1 w-3 h-3" />
-                            View
-                          </Link>
-                          {status !== "done" && (
-  <Link
-    to={`/dashboard/edit-donation-request/${req._id}`}
-    className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-yellow-700 bg-white hover:bg-yellow-50 focus:outline-none"
-  >
-    <FiEdit2 className="mr-1 w-3 h-3" />
-    Edit
-  </Link>
-)}
+                      <button
+                        onClick={() => handleDelete(req._id)}
+                        title="Delete Request"
+                        className="p-1 rounded hover:bg-red-100 text-red-600"
+                      >
+                        <FiTrash2 className="w-5 h-5" />
+                      </button>
 
+                      <button
+                        onClick={() =>
+                          navigate(`/dashboard/donation-requests/${req._id}`)
+                        }
+                        title="View Details"
+                        className="p-1 rounded hover:bg-gray-200 text-gray-700"
+                      >
+                        <FiEye className="w-5 h-5" />
+                      </button>
+
+                      {/* For in-progress status, allow marking done or canceled */}
+                      {req.status?.toLowerCase() === "inprogress" && (
+                        <>
                           <button
-                            onClick={() => handleDelete(req._id)}
-                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none"
+                            onClick={() => handleStatusUpdate(req._id, "done")}
+                            title="Mark as Done"
+                            className="p-1 rounded hover:bg-green-100 text-green-600"
                           >
-                            <FiTrash2 className="mr-1 w-3 h-3" />
-                            Delete
+                            <FiCheckCircle className="w-5 h-5" />
                           </button>
-
-                          {status === "inprogress" && (
-                            <>
-                              <button
-                                onClick={() => handleStatusUpdate(req._id, "done")}
-                                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-green-700 bg-white hover:bg-green-50 focus:outline-none"
-                              >
-                                <FiCheckCircle className="mr-1 w-3 h-3" />
-                                Mark Done
-                              </button>
-                              <button
-                                onClick={() => handleStatusUpdate(req._id, "canceled")}
-                                className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                              >
-                                <FiXCircle className="mr-1 w-3 h-3" />
-                                Cancel
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                          <button
+                            onClick={() => handleStatusUpdate(req._id, "canceled")}
+                            title="Cancel Request"
+                            className="p-1 rounded hover:bg-gray-200 text-gray-500"
+                          >
+                            <FiXCircle className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
-          <div className="px-6 py-4 bg-gray-50 text-right border-t border-gray-100">
+          <div className="p-6 border-t border-gray-100 text-right">
             <Link
               to="/dashboard/my-donation-requests"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className="inline-block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
             >
-              View All Requests
+              View My All Requests
             </Link>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center border border-gray-100">
-          <div className="mx-auto h-24 w-24 text-red-400 mb-4 flex items-center justify-center">
-            <FiDroplet className="w-full h-full" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900">No donation requests found</h3>
-          <p className="mt-2 text-gray-500">You haven't made any donation requests yet.</p>
+        <div className="text-center text-gray-600 py-16">
+          <p>You have not submitted any donation requests yet.</p>
           <Link
-            to="/dashboard/create-donation-request"
-            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+            to="/dashboard/donation-requests/create"
+            className="mt-4 inline-block px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition"
           >
-            Create New Request
+            Create Your First Donation Request
           </Link>
         </div>
       )}

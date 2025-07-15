@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../provider/AuthProvider";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useQuery } from "@tanstack/react-query";
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -10,9 +11,6 @@ const CreateDonationRequest = () => {
 
   const [districts, setDistricts] = useState([]);
   const [allUpazilas, setAllUpazilas] = useState([]);
-
-  const [userStatus, setUserStatus] = useState(null); // active | blocked
-  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     recipientName: "",
@@ -26,21 +24,27 @@ const CreateDonationRequest = () => {
     requestMessage: "",
   });
 
+  // ✅ Fetch user status using React Query
+  const { data: userStatus, isLoading } = useQuery({
+    queryKey: ["userStatus", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axios.get(
+        `http://localhost:5000/api/users/${user.email}`
+      );
+      return res.data.status; // expected: 'active' or 'blocked'
+    },
+  });
+
   // ✅ Fetch district & upazila data
   useEffect(() => {
     fetch("/data/districts.json")
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch districts");
-        return res.json();
-      })
+      .then(res => res.json())
       .then(districtData => {
         setDistricts(districtData.map(d => d.name));
         return fetch("/data/Upazilas.json");
       })
-      .then(res2 => {
-        if (!res2.ok) throw new Error("Failed to fetch upazilas");
-        return res2.json();
-      })
+      .then(res2 => res2.json())
       .then(upazilaData => {
         setAllUpazilas(upazilaData.map(u => u.name).sort());
       })
@@ -48,25 +52,6 @@ const CreateDonationRequest = () => {
         console.error("Fetch error:", err);
       });
   }, []);
-
-  // ✅ Fetch current user's status from backend
-  useEffect(() => {
-    if (!user?.email) return;
-
-    const fetchUserStatus = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/api/users/${user.email}`);
-        setUserStatus(res.data.status); // should return { status: 'active' } or 'blocked'
-      } catch (err) {
-        console.error("Failed to fetch user status:", err);
-        setUserStatus("unknown");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserStatus();
-  }, [user?.email]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,8 +106,8 @@ const CreateDonationRequest = () => {
     }
   };
 
-  // ✅ Loading state
-  if (loading) {
+  // ✅ Loading while checking user status
+  if (isLoading) {
     return (
       <div className="text-center py-8 text-lg font-medium text-gray-600">
         Checking user access...
@@ -130,7 +115,7 @@ const CreateDonationRequest = () => {
     );
   }
 
-  // ✅ Blocked user access message
+  // ✅ Blocked user view
   if (userStatus === "blocked") {
     return (
       <div className="max-w-xl mx-auto text-center mt-10 p-6 bg-red-50 border border-red-200 rounded shadow text-red-700">
@@ -141,7 +126,7 @@ const CreateDonationRequest = () => {
     );
   }
 
-  // ✅ Main form for active users
+  // ✅ Main form
   return (
     <div className="max-w-3xl mx-auto bg-white p-6 rounded shadow mt-4">
       <h2 className="text-2xl font-bold mb-4">Create Donation Request</h2>

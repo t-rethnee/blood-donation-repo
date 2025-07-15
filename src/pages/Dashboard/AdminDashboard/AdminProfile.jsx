@@ -1,13 +1,14 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { AuthContext } from "../../../provider/AuthProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { FiEdit2, FiSave } from "react-icons/fi";
+import { useQuery } from "@tanstack/react-query";
 
 const AdminProfile = () => {
   const { user } = useContext(AuthContext);
-  const [adminData, setAdminData] = useState(null);
+
   const [editable, setEditable] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -19,38 +20,50 @@ const AdminProfile = () => {
   const [hasChanged, setHasChanged] = useState(false);
   const originalData = useRef({});
 
+  // Fetch user data by email from backend
+  const fetchAdminData = async () => {
+    const res = await axios.get(`http://localhost:5000/api/users/${user.email}`);
+    // res.data is the user object directly
+    console.log("API response:", res.data);
+    return res.data;
+  };
+
+  const {
+    data: adminData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["adminData", user?.email],
+    queryFn: fetchAdminData,
+    enabled: !!user?.email,
+    onSuccess: (userData) => {
+      console.log("User data inside onSuccess:", userData);
+      // Update form data using userData directly
+      setFormData({
+        name: userData.name || "",
+        avatar: userData.avatar || "",
+        district: userData.district || "",
+        upazila: userData.upazila || "",
+        bloodGroup: userData.bloodGroup || "",
+      });
+      originalData.current = {
+        name: userData.name || "",
+        avatar: userData.avatar || "",
+        district: userData.district || "",
+        upazila: userData.upazila || "",
+        bloodGroup: userData.bloodGroup || "",
+      };
+      setHasChanged(false);
+    },
+  });
+
   useEffect(() => {
-    const fetchAdminData = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/api/users/${user.email}`);
-        const userData = res.data;
-        setAdminData(userData);
-        setFormData({
-          name: userData.name || "",
-          avatar: userData.avatar || "",
-          district: userData.district || "",
-          upazila: userData.upazila || "",
-          bloodGroup: userData.bloodGroup || "",
-        });
-        originalData.current = {
-          name: userData.name || "",
-          avatar: userData.avatar || "",
-          district: userData.district || "",
-          upazila: userData.upazila || "",
-          bloodGroup: userData.bloodGroup || "",
-        };
-        setHasChanged(false);
-      } catch (error) {
-        toast.error("Failed to load profile data.");
-        console.error(error);
-      }
-    };
+    console.log("formData updated:", formData);
+  }, [formData]);
 
-    if (user?.email) {
-      fetchAdminData();
-    }
-  }, [user?.email]);
-
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
@@ -63,6 +76,7 @@ const AdminProfile = () => {
     });
   };
 
+  // Activate edit mode
   const handleEditClick = () => {
     setEditable(true);
     Swal.fire({
@@ -73,6 +87,7 @@ const AdminProfile = () => {
     });
   };
 
+  // Update user profile in backend
   const handleUpdate = async () => {
     try {
       await axios.put(`http://localhost:5000/api/users/${user.email}`, formData);
@@ -85,15 +100,23 @@ const AdminProfile = () => {
       originalData.current = { ...formData };
       setEditable(false);
       setHasChanged(false);
-      setAdminData((prev) => ({ ...prev, ...formData }));
+      refetch();
     } catch (error) {
       toast.error("Failed to update profile.");
       console.error(error);
     }
   };
 
-  if (!adminData) {
+  if (isLoading) {
     return <div className="p-6 text-center text-gray-600">Loading profile...</div>;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6 text-center text-red-600">
+        Error loading profile: {error.message || "Unknown error"}
+      </div>
+    );
   }
 
   return (
