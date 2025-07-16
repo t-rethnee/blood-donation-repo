@@ -12,7 +12,7 @@ const AdminDashboardHome = () => {
     donations: 0,
   });
 
-  const [loading, setLoading] = useState(true); // 🔄 loading state
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const fetchStats = async () => {
