@@ -29,7 +29,7 @@ const AdminDashboardHome = () => {
           donations: donationRes.data.count || 0,
         });
 
-        setLoading(false); // ✅ done loading
+        setLoading(false); 
       } catch (err) {
         console.error("Failed to load stats", err);
         setLoading(false);
