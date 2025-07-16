@@ -62,7 +62,7 @@ const VolunteerAddBlog = () => {
         title,
         thumbnailUrl,
         content,
-        status: "draft", // default to draft
+        status: "draft", 
         // optionally add a field to mark this blog as volunteer created, if backend supports
       });
       alert("Blog created successfully!");
