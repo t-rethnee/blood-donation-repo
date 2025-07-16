@@ -115,7 +115,7 @@ const CreateDonationRequest = () => {
     );
   }
 
-  // ✅ Blocked user view
+  
   if (userStatus === "blocked") {
     return (
       <div className="max-w-xl mx-auto text-center mt-10 p-6 bg-red-50 border border-red-200 rounded shadow text-red-700">
