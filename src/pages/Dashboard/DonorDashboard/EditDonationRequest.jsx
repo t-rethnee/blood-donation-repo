@@ -23,7 +23,7 @@ const EditDonationRequest = () => {
   } = useQuery({
     queryKey: ["donationRequest", id],
     queryFn: () => fetchDonationRequest(id),
-    // refetchOnWindowFocus: false, // optional
+    
   });
 
   // Local state for form inputs, initialized once data is fetched
