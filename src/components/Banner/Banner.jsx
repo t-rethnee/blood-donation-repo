@@ -43,7 +43,7 @@ const Banner = () => {
         <div className="flex-1 space-y-6 text-center md:text-left">
           {/* Badge
           
-            <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+            
            
           </div> */}
 
