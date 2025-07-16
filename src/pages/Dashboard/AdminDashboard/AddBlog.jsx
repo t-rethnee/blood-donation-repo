@@ -61,7 +61,7 @@ const AddBlog = () => {
         title,
         thumbnailUrl,
         content,
-        status: "draft", // default status
+        status: "draft", 
       });
 
       await Swal.fire("Success", "Blog created successfully!", "success");
