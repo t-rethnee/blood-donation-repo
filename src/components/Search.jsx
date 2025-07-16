@@ -16,7 +16,7 @@ const Search = () => {
   const [upazilas, setUpazilas] = useState([]);
 
   useEffect(() => {
-    // Fetch districts
+    
     fetch("/data/districts.json")
       .then((res) => res.json())
       .then((data) => setDistricts(data))
