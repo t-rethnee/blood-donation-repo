@@ -21,7 +21,7 @@ const FundTable = ({ funds }) => {
   const itemsPerPage = 5;
 
   if (!funds || funds.length === 0) {
-    // Show loader if no data yet or empty
+   
     return (
       <div className="w-full max-w-5xl mx-auto px-4 py-6 bg-white rounded-xl shadow-lg">
         <Loader />
