@@ -60,7 +60,7 @@ const { user: authUser, loading, firebaseUser } = useContext(AuthContext);
     );
   }
 
-  // ইউজার লগইন না 
+  
   if (!authUser) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
