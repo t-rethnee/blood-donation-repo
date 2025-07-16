@@ -1,12 +1,117 @@
-# React + Vite
+🔥 RedAid — Blood Donation Platform
+A full-featured MERN Stack Blood Donation Web Application built for managing blood donations, donor registration, content publishing, and role-based access with three distinct user roles — Admin, Volunteer, and Donor.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🌟 Core Features
+👥 Role Management
+Admin 🌐:
 
-Currently, two official plugins are available:
+Full access to all features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Can manage users, donation requests, and blogs
 
-## Expanding the ESLint configuration
+Can assign roles and block/unblock users
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Volunteer 🤝:
+
+Can manage and update blood donation requests
+
+Has limited content management access (can’t publish/delete blogs)
+
+Donor 🩸:
+
+Can register, respond to requests, and manage their own profile
+
+Can create and manage personal donation requests
+
+💡 Make any user an admin by updating the role directly in the database.
+
+🔐 Authentication
+📝 Registration
+Users register with:
+
+email, name, password, confirm password
+
+avatar (uploaded using imageBB)
+
+blood group, district, upazila
+
+By default:
+
+Role: donor
+
+Status: active
+
+🔓 Login
+Email/password-based login
+
+Navigation between login and registration
+👑 Admin Dashboard
+🏠 Home: Stats on total users, donations, and funding.
+
+👥 All Users:
+
+View user list with avatar, name, email, role, status.
+
+Actions: 🔒 Block/Unblock, 🤝 Make Volunteer, 🌐 Make Admin.
+
+🩸 All Donation Requests:
+
+Manage all requests.
+
+Filter, paginate, update status, assign donors, delete/edit.
+
+📝 Content Management:
+
+Add blogs with title, thumbnail, and rich content.
+
+View all blogs.
+
+📢 Publish/Unpublish, 🗑️ Delete, ✏️ (optional) Edit.
+
+🤝 Volunteer Dashboard
+🏠 Home: Same dashboard stats as admin.
+
+🩸 All Donation Requests:
+
+View and update status of all requests.
+
+❌ Cannot delete or assign donors.
+
+📝 Content Management:
+
+Can add blogs.
+
+Can view all blogs.
+
+❌ Cannot publish/unpublish or delete.
+
+
+🩸 Donor Dashboard
+🏠 Home:
+
+Welcome message with name.
+
+Shows 3 recent personal donation requests.
+
+📋 My Requests:
+
+Full list of own donation requests.
+
+Filter by status, paginate.
+
+Actions: ✅ Done, ❌ Cancel, ✏️ Edit, 🗑️ Delete, 🔍 View.
+
+➕ Create Request:
+
+Form to submit new blood donation request.
+
+Auto-fills requester info.
+
+👤 Profile:
+
+View/update name, avatar, district, upazila, blood group.
+
+Email is non-editable.
+
+Editable on clicking Edit, saved via Save.
+

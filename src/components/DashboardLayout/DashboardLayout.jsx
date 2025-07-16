@@ -9,32 +9,45 @@ import {
 } from "react-icons/fi";
 
 const DashboardLayout = () => {
-  const { user: authUser, loading } = useContext(AuthContext); // Firebase auth ইউজার ও লোডিং নিলাম
+const { user: authUser, loading, firebaseUser } = useContext(AuthContext);
+ // Firebase auth ইউজার ও লোডিং নিলাম
   const [user, setUser] = useState(null); // Backend থেকে সম্পূর্ণ ইউজার ডাটা
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    if (!authUser?.email) {
+  if (!authUser?.email || !firebaseUser) {
+    setUser(null);
+    return;
+  }
+
+  async function fetchUser() {
+    try {
+      const token = await firebaseUser.getIdToken();
+      console.log("Firebase ID Token:", token);
+
+      const res = await fetch(`https://blood-donation-server-iota-flame.vercel.app/api/users/${authUser.email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch user data");
+
+      const data = await res.json();
+      setUser(data);
+    } catch (err) {
+      console.error(err);
       setUser(null);
-      return;
     }
+  }
 
-    async function fetchUser() {
-      try {
-        const res = await fetch(`http://localhost:5000/api/users/${authUser.email}`);
-        if (!res.ok) throw new Error("Failed to fetch user data");
-        const data = await res.json();
-        setUser(data);
-      } catch (err) {
-        console.error(err);
-        setUser(null);
-      }
-    }
+  fetchUser();
+}, [authUser, firebaseUser]);
 
-    fetchUser();
-  }, [authUser]);
+
 
   // Auth state loading হলে spinner দেখাও
   if (loading) {
@@ -47,7 +60,7 @@ const DashboardLayout = () => {
     );
   }
 
-  // ইউজার লগইন না থাকলে লগইন পেজে পাঠিয়ে দাও (এটা একটা safety নেটওয়ার্ক, ideally PrivateRoute করবে)
+  // ইউজার লগইন না থাকলে লগইন পেজে পাঠিয়ে দাও 
   if (!authUser) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }

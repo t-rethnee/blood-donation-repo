@@ -19,7 +19,7 @@ const fetchRequests = async ({ queryKey }) => {
     page,
     limit,
   };
-  const res = await axios.get("http://localhost:5000/api/donation-requests", { params });
+  const res = await axios.get("https://blood-donation-server-iota-flame.vercel.app/api/donation-requests", { params });
   return res.data;
 };
 
@@ -40,7 +40,7 @@ const AllDonationRequests = () => {
   // React Query useMutation with new single object syntax
   const mutation = useMutation({
     mutationFn: ({ id, newStatus }) =>
-      axios.patch(`http://localhost:5000/api/donation-requests/${id}/status`, { status: newStatus }),
+      axios.patch(`https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}/status`, { status: newStatus }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["donationRequests"] });
     },

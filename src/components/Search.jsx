@@ -52,7 +52,7 @@ const Search = () => {
 
   try {
     const response = await fetch(
-  `http://localhost:5000/api/donors?bloodGroup=${encodeURIComponent(bloodGroup)}&district=${encodeURIComponent(district)}&upazila=${encodeURIComponent(upazila)}`
+  `https://blood-donation-server-iota-flame.vercel.app/api/donors?bloodGroup=${encodeURIComponent(bloodGroup)}&district=${encodeURIComponent(district)}&upazila=${encodeURIComponent(upazila)}`
 );
 
     const data = await response.json();

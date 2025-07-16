@@ -25,7 +25,7 @@ const MyDonationRequests = () => {
   const fetchDonationRequests = async () => {
     if (!user?.email) return [];
     const res = await axios.get(
-      `http://localhost:5000/api/donation-requests/by-donor/${user.email}`
+      `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/by-donor/${user.email}`
     );
     if (Array.isArray(res.data)) {
       return res.data;
@@ -52,7 +52,7 @@ const MyDonationRequests = () => {
   const handleStatusUpdate = async (id, status) => {
     try {
       const result = await axios.patch(
-        `http://localhost:5000/api/donation-requests/status/${id}`,
+        `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/status/${id}`,
         { status }
       );
       if (result.data.modifiedCount > 0) {
@@ -97,7 +97,7 @@ const MyDonationRequests = () => {
     if (confirm.isConfirmed) {
       try {
         const res = await axios.delete(
-          `http://localhost:5000/api/donation-requests/${id}`
+          `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}`
         );
         if (res.data.deletedCount > 0) {
           Swal.fire({
@@ -305,15 +305,17 @@ const MyDonationRequests = () => {
                         </Link>
                       )}
 
-                      {["pending", "inprogress"].includes(request.status?.toLowerCase()) && (
-                        <button
-                          onClick={() => handleDelete(request._id)}
-                          title="Delete Request"
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
-                      )}
+                     {["pending", "inprogress", "done", "canceled"].includes(request.status?.toLowerCase()) && (
+  <button
+    onClick={() => handleDelete(request._id)}
+    title="Delete Request"
+    className="text-red-600 hover:text-red-800"
+  >
+    <FiTrash2 size={18} />
+  </button>
+)}
+
+
                     </td>
                   </tr>
                 ))}

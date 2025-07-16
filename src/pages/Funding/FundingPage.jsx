@@ -13,7 +13,7 @@ const FundingPage = () => {
 
   const fetchFunds = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/fundings");
+      const res = await axios.get("https://blood-donation-server-iota-flame.vercel.app/fundings");
       setFunds(res.data);
     } catch (error) {
       console.error("Failed to fetch funding history", error);

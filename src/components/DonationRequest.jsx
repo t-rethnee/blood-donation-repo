@@ -20,7 +20,7 @@ const DonationRequest = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/donation-requests?status=pending")
+      .get("https://blood-donation-server-iota-flame.vercel.app/api/donation-requests?status=pending")
       .then((res) => {
         setRequests(res.data.donationRequests);
       })

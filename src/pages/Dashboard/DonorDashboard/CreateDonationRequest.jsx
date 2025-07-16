@@ -30,7 +30,7 @@ const CreateDonationRequest = () => {
     enabled: !!user?.email,
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:5000/api/users/${user.email}`
+        `https://blood-donation-server-iota-flame.vercel.app/api/users/${user.email}`
       );
       return res.data.status; // expected: 'active' or 'blocked'
     },
@@ -79,7 +79,7 @@ const CreateDonationRequest = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/donation-requests",
+        "https://blood-donation-server-iota-flame.vercel.app/api/donation-requests",
         requestData
       );
       if (res.data.insertedId) {

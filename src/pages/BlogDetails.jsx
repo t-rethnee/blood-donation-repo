@@ -11,7 +11,7 @@ const BlogDetail = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+        const response = await axios.get(`https://blood-donation-server-iota-flame.vercel.app/api/blogs/${id}`);
         if (response.data.status !== "published") {
           setError("This article is currently unavailable");
         } else {

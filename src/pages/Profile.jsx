@@ -35,7 +35,7 @@ const Profile = () => {
   // Load user data from backend
   useEffect(() => {
     if (user?.email) {
-      axios.get(`http://localhost:5000/api/users/${user.email}`)
+      axios.get(`https://blood-donation-server-iota-flame.vercel.app/api/users/${user.email}`)
         .then((res) => {
           const backendAvatar = res.data.avatar;
           setAvatarUrl(backendAvatar || user.photoURL || "https://i.ibb.co/2nJpM6v/default-avatar.png");
@@ -80,7 +80,7 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/users/${user.email}`, formData);
+      await axios.put(`https://blood-donation-server-iota-flame.vercel.app/api/users/${user.email}`, formData);
       setOriginalData(formData);
       setIsEditing(false);
       Swal.fire({

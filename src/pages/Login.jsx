@@ -17,8 +17,15 @@ const Login = () => {
 
   try {
     const userCredential = await loginUser(email, password);
+    const user = userCredential.user;
 
-    // ✅ Save email to localStorage for dashboard access
+    // ✅ Get Firebase ID token (JWT)
+    const token = await user.getIdToken();
+console.log(" Firebase Token:", token);
+    // ✅ Store token in localStorage
+    localStorage.setItem("access-token", token);
+
+    // ✅ Store email for dashboard access 
     localStorage.setItem("userEmail", email);
 
     Swal.fire({
@@ -30,9 +37,11 @@ const Login = () => {
 
     navigate("/");
   } catch (err) {
+    console.error("Login error:", err);
     setError("Invalid credentials or user not found.");
   }
 };
+
 
 
   return (

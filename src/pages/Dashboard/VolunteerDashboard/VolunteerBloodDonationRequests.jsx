@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import { AuthContext } from "../../../provider/AuthProvider";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -16,11 +16,12 @@ const VolunteerBloodDonationRequests = () => {
   const [updatingId, setUpdatingId] = useState(null);
 
   const { user, loading: authLoading } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
 
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/volunteer/donation-requests", {
+      const res = await axiosSecure.get("/volunteer/donation-requests", {
         params: { status: statusFilter !== "all" ? statusFilter : undefined },
       });
       setRequests(res.data.data || []);
@@ -59,7 +60,7 @@ const VolunteerBloodDonationRequests = () => {
         body.donorEmail = user.email;
       }
 
-      await axios.patch(`http://localhost:5000/api/donation-requests/${id}/status`, body);
+      await axiosSecure.patch(`/donation-requests/${id}/status`, body);
 
       Swal.fire({
         title: "Success!",
@@ -89,14 +90,14 @@ const VolunteerBloodDonationRequests = () => {
   };
 
   if (loading || authLoading)
-  return (
-    <div className="flex justify-center items-center min-h-[300px]">
-      <div className="flex flex-col items-center space-y-3">
-        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-red-600 font-semibold text-lg">Loading requests...</p>
+    return (
+      <div className="flex justify-center items-center min-h-[300px]">
+        <div className="flex flex-col items-center space-y-3">
+          <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-red-600 font-semibold text-lg">Loading requests...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
 
   return (
     <div className="p-6 max-w-6xl mx-auto">

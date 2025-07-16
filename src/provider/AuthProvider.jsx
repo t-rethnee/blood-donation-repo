@@ -11,14 +11,23 @@ import { auth } from "../firebase/firebase.config";
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // Custom user object with role etc.
+  const [firebaseUser, setFirebaseUser] = useState(null); // Actual Firebase user
   const [loading, setLoading] = useState(true);
 
-  // Backend থেকে ইউজারের role ফেচ করার ফাংশন
+  // Backend থেকে ইউজারের role fetch করার ফাংশন, token সহ
   const fetchUserRole = async (email) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${email}`);
+      const token = await auth.currentUser.getIdToken(); // Firebase থেকে ID token নাও
+
+      const res = await fetch(`https://blood-donation-server-iota-flame.vercel.app/api/users/${email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // token header এ পাঠাও
+        },
+      });
+
       if (!res.ok) throw new Error("Failed to fetch user role");
+
       const data = await res.json();
       return data.role || null; // role না থাকলে null রিটার্ন করো
     } catch (error) {
@@ -29,10 +38,12 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (loggedInUser) => {
-      if (loggedInUser?.email) {
-        setLoading(true);  // loading true করে নিচ্ছি ডাটা ফেচ করার সময়
+      setLoading(true);
 
-        // backend থেকে role ফেচ করো
+      if (loggedInUser?.email) {
+        setFirebaseUser(loggedInUser); // Set the actual Firebase user
+
+        // backend থেকে role fetch করো token সহ
         const role = await fetchUserRole(loggedInUser.email);
 
         setUser({
@@ -40,16 +51,17 @@ const AuthProvider = ({ children }) => {
           email: loggedInUser.email,
           displayName: loggedInUser.displayName || "",
           photoURL: loggedInUser.photoURL || "",
-          role: role || "donor",  // ডিফল্ট 'donor' যদি role না পাওয়া যায়
+          role: role || "donor", // ডিফল্ট 'donor' যদি role না পাওয়া যায়
         });
 
         localStorage.setItem("userEmail", loggedInUser.email);
-        setLoading(false);
       } else {
         setUser(null);
+        setFirebaseUser(null);
         localStorage.removeItem("userEmail");
-        setLoading(false);
       }
+
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -105,6 +117,7 @@ const AuthProvider = ({ children }) => {
 
   const authInfo = {
     user,
+    firebaseUser,
     loading,
     createUser,
     loginUser,

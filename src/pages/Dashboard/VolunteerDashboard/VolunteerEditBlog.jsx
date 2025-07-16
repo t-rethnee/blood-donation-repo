@@ -18,7 +18,7 @@ const VolunteerEditBlog = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/blogs/${id}`);
+        const response = await axios.get(`https://blood-donation-server-iota-flame.vercel.app/api/blogs/${id}`);
         const blog = response.data;
         setTitle(blog.title);
         setThumbnailUrl(blog.thumbnailUrl);
@@ -36,7 +36,7 @@ const VolunteerEditBlog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/blogs/${id}`, {
+      await axios.put(`https://blood-donation-server-iota-flame.vercel.app/api/blogs/${id}`, {
         title,
         thumbnailUrl,
         content,

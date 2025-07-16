@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
+import React, { useContext, useState, useRef } from "react";
 import { AuthContext } from "../../../provider/AuthProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -7,7 +7,7 @@ import { FiEdit2, FiSave } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 
 const AdminProfile = () => {
-  const { user } = useContext(AuthContext);
+  const { user, firebaseUser } = useContext(AuthContext);
 
   const [editable, setEditable] = useState(false);
   const [formData, setFormData] = useState({
@@ -20,11 +20,21 @@ const AdminProfile = () => {
   const [hasChanged, setHasChanged] = useState(false);
   const originalData = useRef({});
 
-  // Fetch user data by email from backend
   const fetchAdminData = async () => {
-    const res = await axios.get(`http://localhost:5000/api/users/${user.email}`);
-    // res.data is the user object directly
-    console.log("API response:", res.data);
+    if (!firebaseUser) {
+      throw new Error("No authenticated Firebase user");
+    }
+    const token = await firebaseUser.getIdToken();
+
+    const res = await axios.get(
+      `https://blood-donation-server-iota-flame.vercel.app/api/users/${user.email}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     return res.data;
   };
 
@@ -37,10 +47,8 @@ const AdminProfile = () => {
   } = useQuery({
     queryKey: ["adminData", user?.email],
     queryFn: fetchAdminData,
-    enabled: !!user?.email,
+    enabled: !!user?.email && !!firebaseUser,
     onSuccess: (userData) => {
-      console.log("User data inside onSuccess:", userData);
-      // Update form data using userData directly
       setFormData({
         name: userData.name || "",
         avatar: userData.avatar || "",
@@ -59,11 +67,24 @@ const AdminProfile = () => {
     },
   });
 
-  useEffect(() => {
-    console.log("formData updated:", formData);
-  }, [formData]);
+  // Early return for loading, error and no data states
+  if (isLoading) {
+    return <div className="p-6 text-center text-gray-600">Loading profile...</div>;
+  }
 
-  // Handle form input changes
+  if (isError) {
+    return (
+      <div className="p-6 text-center text-red-600">
+        Error loading profile: {error.message || "Unknown error"}
+      </div>
+    );
+  }
+
+  if (!adminData) {
+    return <div className="p-6 text-center text-gray-600">No profile data found.</div>;
+  }
+
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
@@ -76,7 +97,6 @@ const AdminProfile = () => {
     });
   };
 
-  // Activate edit mode
   const handleEditClick = () => {
     setEditable(true);
     Swal.fire({
@@ -87,16 +107,29 @@ const AdminProfile = () => {
     });
   };
 
-  // Update user profile in backend
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/users/${user.email}`, formData);
+      if (!firebaseUser) throw new Error("No authenticated Firebase user");
+
+      const token = await firebaseUser.getIdToken();
+
+      await axios.put(
+        `https://blood-donation-server-iota-flame.vercel.app/api/users/${user.email}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       Swal.fire({
         icon: "success",
         title: "Profile updated successfully!",
         timer: 1500,
         showConfirmButton: false,
       });
+
       originalData.current = { ...formData };
       setEditable(false);
       setHasChanged(false);
@@ -106,18 +139,6 @@ const AdminProfile = () => {
       console.error(error);
     }
   };
-
-  if (isLoading) {
-    return <div className="p-6 text-center text-gray-600">Loading profile...</div>;
-  }
-
-  if (isError) {
-    return (
-      <div className="p-6 text-center text-red-600">
-        Error loading profile: {error.message || "Unknown error"}
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8 bg-gray-50 rounded-lg shadow-md">

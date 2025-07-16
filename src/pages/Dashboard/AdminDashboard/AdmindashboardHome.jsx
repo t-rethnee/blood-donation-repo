@@ -18,9 +18,9 @@ const AdminDashboardHome = () => {
     const fetchStats = async () => {
       try {
         const [userRes, fundRes, donationRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/stats/donors-count"),
-          axios.get("http://localhost:5000/api/admin/stats/funds/simple-sum"),
-          axios.get("http://localhost:5000/api/admin/stats/donation-requests"),
+          axios.get("https://blood-donation-server-iota-flame.vercel.app/api/admin/stats/donors-count"),
+          axios.get("https://blood-donation-server-iota-flame.vercel.app/api/admin/stats/funds/simple-sum"),
+          axios.get("https://blood-donation-server-iota-flame.vercel.app/api/admin/stats/donation-requests"),
         ]);
 
         setStats({

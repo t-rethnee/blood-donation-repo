@@ -22,7 +22,7 @@ const ManageUsers = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `http://localhost:5000/api/users${
+        `https://blood-donation-server-iota-flame.vercel.app/api/users${
           statusFilter !== "all" ? `?status=${statusFilter}` : ""
         }`
       );
@@ -41,7 +41,7 @@ const ManageUsers = () => {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await axios.patch(
-        `http://localhost:5000/api/users/${id}/status`,
+        `https://blood-donation-server-iota-flame.vercel.app/api/users/${id}/status`,
         { status: newStatus }
       );
       setUsers((prevUsers) =>
@@ -57,7 +57,7 @@ const ManageUsers = () => {
   const handleRoleChange = async (id, newRole) => {
     try {
       await axios.patch(
-        `http://localhost:5000/api/users/${id}/role`,
+        `https://blood-donation-server-iota-flame.vercel.app/api/users/${id}/role`,
         { role: newRole }
       );
       setUsers((prevUsers) =>

@@ -24,7 +24,7 @@ const DonationRequestDetails = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/donation-requests/${id}`)
+      .get(`https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}`)
       .then((res) => setRequest(res.data))
       .catch((err) => console.error(err));
   }, [id]);
@@ -42,7 +42,7 @@ const DonationRequestDetails = () => {
       };
 
       const res = await axios.put(
-        `http://localhost:5000/api/donation-requests/${id}`,
+        `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}`,
         updateData
       );
 

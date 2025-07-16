@@ -19,7 +19,7 @@ const BlogList = () => {
   useEffect(() => {
     const fetchPublishedBlogs = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/blogs", {
+        const response = await axios.get("https://blood-donation-server-iota-flame.vercel.app/api/blogs", {
           params: { status: "published" },
         });
         setBlogs(response.data.blogs || []);

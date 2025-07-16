@@ -57,7 +57,7 @@ const AddBlog = () => {
     setSubmitting(true);
 
     try {
-      await axios.post("http://localhost:5000/api/blogs", {
+      await axios.post("https://blood-donation-server-iota-flame.vercel.app/api/blogs", {
         title,
         thumbnailUrl,
         content,

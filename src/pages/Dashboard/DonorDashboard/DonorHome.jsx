@@ -26,7 +26,7 @@ const DonorHome = () => {
   const fetchRequests = async () => {
     if (!user?.email) return [];
     const response = await axios.get(
-      `http://localhost:5000/api/donation-requests/by-donor/${user.email}`
+      `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/by-donor/${user.email}`
     );
     if (Array.isArray(response.data)) {
       return response.data;
@@ -51,7 +51,7 @@ const DonorHome = () => {
   const handleStatusUpdate = async (id, status) => {
     try {
       const result = await axios.patch(
-        `http://localhost:5000/api/donation-requests/status/${id}`,
+        `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/status/${id}`,
         { status }
       );
       if (result.data.modifiedCount > 0) {
@@ -91,7 +91,7 @@ const DonorHome = () => {
     if (confirm.isConfirmed) {
       try {
         const res = await axios.delete(
-          `http://localhost:5000/api/donation-requests/${id}`
+          `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}`
         );
         if (res.data.deletedCount > 0) {
           Swal.fire({

@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const fetchDonationRequest = async (id) => {
-  const res = await axios.get(`http://localhost:5000/api/donation-requests/${id}`);
+  const res = await axios.get(`https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}`);
   return res.data;
 };
 
@@ -45,14 +45,14 @@ const EditDonationRequest = () => {
     e.preventDefault();
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/donation-requests/${id}`,
+        `https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}`,
         formState
       );
       if (res.data.modifiedCount > 0) {
         Swal.fire("Updated!", "Donation request updated successfully", "success");
         // Invalidate the query so data is fresh next time
         queryClient.invalidateQueries({ queryKey: ["donationRequest", id] });
-        navigate("/dashboard/my-donation-requests");
+        navigate("/dashboard");
       } else {
         Swal.fire("No Changes", "No updates were made", "info");
       }

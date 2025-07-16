@@ -20,7 +20,7 @@ const BlogManagement = () => {
   const fetchBlogs = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/blogs", {
+      const response = await axios.get("https://blood-donation-server-iota-flame.vercel.app/api/blogs", {
         params: {
           status: statusFilter,
           page,
@@ -61,7 +61,7 @@ const BlogManagement = () => {
   if (result.isConfirmed) {
     try {
       const newStatus = blog.status === "draft" ? "published" : "draft";
-      await axios.patch(`http://localhost:5000/api/blogs/${blog._id}/status`, {
+      await axios.patch(`https://blood-donation-server-iota-flame.vercel.app/api/blogs/${blog._id}/status`, {
         status: newStatus,
       });
       await fetchBlogs();
@@ -91,7 +91,7 @@ const BlogManagement = () => {
 
   if (result.isConfirmed) {
     try {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`);
+      await axios.delete(`https://blood-donation-server-iota-flame.vercel.app/api/blogs/${id}`);
       await fetchBlogs();
       Swal.fire("Deleted!", "Blog has been deleted.", "success");
     } catch (error) {

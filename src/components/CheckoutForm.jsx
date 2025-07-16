@@ -19,7 +19,7 @@ const CheckoutForm = ({ user = {}, onSuccess = () => {} }) => {
   useEffect(() => {
     if (amount > 0) {
       axios
-        .post("http://localhost:5000/create-payment-intent", { amount })
+        .post("https://blood-donation-server-iota-flame.vercel.app/create-payment-intent", { amount })
         .then((res) => {
           setClientSecret(res.data.clientSecret);
         })
@@ -63,7 +63,7 @@ const CheckoutForm = ({ user = {}, onSuccess = () => {} }) => {
 
       // Save funding to DB
       try {
-        await axios.post("http://localhost:5000/fundings", {
+        await axios.post("https://blood-donation-server-iota-flame.vercel.app/fundings", {
           name,
           email,
           amount,

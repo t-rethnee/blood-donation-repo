@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../provider/AuthProvider";
-import axios from "axios";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 
 const VolunteerProfile = () => {
-  const { user } = useContext(AuthContext);
+  const { user, firebaseUser } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,39 +16,43 @@ const VolunteerProfile = () => {
     bloodGroup: "",
   });
 
+
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch profile data
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/users/${user.email}`);
-        const data = res.data;
-        setFormData({
-          name: data.name || "",
-          email: data.email || "",
-          avatar: data.avatar || "",
-          district: data.district || "",
-          upazila: data.upazila || "",
-          bloodGroup: data.bloodGroup || "",
-        });
-      } catch (error) {
-        toast.error("Failed to load profile");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    if (user?.email) {
-      fetchProfile();
+  useEffect(() => {
+  console.log("JWT:", localStorage.getItem("access-token")); // should show the token
+}, []);
+
+ useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const res = await axiosSecure.get(`/users/${user.email}`);
+      setFormData({
+        name: res.data.name || "",
+        email: res.data.email || "",
+        avatar: res.data.avatar || "",
+        district: res.data.district || "",
+        upazila: res.data.upazila || "",
+        bloodGroup: res.data.bloodGroup || "",
+      });
+    } catch (error) {
+      toast.error("Failed to load profile");
+    } finally {
+      setLoading(false);
     }
-  }, [user?.email]);
+  };
+
+  if (user?.email && firebaseUser) {
+    fetchProfile();
+  }
+}, [user?.email, firebaseUser, axiosSecure]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // পরিবর্তন তখনই করবেন যখন isEditing true
     if (isEditing) {
       setFormData((prev) => ({
         ...prev,
@@ -57,14 +63,13 @@ const VolunteerProfile = () => {
 
   const handleSave = async () => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/${user.email}`, {
+      await axiosSecure.patch(`/users/${user.email}`, {
         name: formData.name,
         avatar: formData.avatar,
         district: formData.district,
         upazila: formData.upazila,
         bloodGroup: formData.bloodGroup,
       });
-
       toast.success("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
@@ -73,7 +78,8 @@ const VolunteerProfile = () => {
     }
   };
 
-  if (loading) return <div className="p-6 text-center text-lg font-medium">Loading profile...</div>;
+  if (loading)
+    return <div className="p-6 text-center text-lg font-medium">Loading profile...</div>;
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-xl mt-10">
@@ -96,7 +102,6 @@ const VolunteerProfile = () => {
         )}
       </div>
 
-      {/* Avatar */}
       <div className="flex justify-center mb-6">
         <img
           src={formData.avatar || "https://i.ibb.co/rpG7ZnP/avatar-placeholder.png"}
@@ -105,8 +110,7 @@ const VolunteerProfile = () => {
         />
       </div>
 
-      {/* Profile Form */}
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={(e) => e.preventDefault()}>
         <div>
           <label className="block text-gray-700 font-medium mb-1">Name</label>
           <input
@@ -117,7 +121,7 @@ const VolunteerProfile = () => {
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
               isEditing ? "border-red-400" : "border-gray-300"
-            } rounded-md shadow-sm focus:outline-none`}
+            } rounded-md shadow-sm`}
           />
         </div>
 
@@ -128,7 +132,7 @@ const VolunteerProfile = () => {
             name="email"
             disabled
             value={formData.email}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
           />
         </div>
 
@@ -142,7 +146,7 @@ const VolunteerProfile = () => {
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
               isEditing ? "border-red-400" : "border-gray-300"
-            } rounded-md shadow-sm focus:outline-none`}
+            } rounded-md shadow-sm`}
           />
         </div>
 
@@ -156,7 +160,7 @@ const VolunteerProfile = () => {
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
               isEditing ? "border-red-400" : "border-gray-300"
-            } rounded-md shadow-sm focus:outline-none`}
+            } rounded-md shadow-sm`}
           />
         </div>
 
@@ -170,7 +174,7 @@ const VolunteerProfile = () => {
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
               isEditing ? "border-red-400" : "border-gray-300"
-            } rounded-md shadow-sm focus:outline-none`}
+            } rounded-md shadow-sm`}
           />
         </div>
 
@@ -183,7 +187,7 @@ const VolunteerProfile = () => {
             onChange={handleChange}
             className={`w-full px-4 py-2 border ${
               isEditing ? "border-red-400" : "border-gray-300"
-            } rounded-md shadow-sm focus:outline-none`}
+            } rounded-md shadow-sm`}
           >
             <option value="">Select</option>
             <option value="A+">A+</option>

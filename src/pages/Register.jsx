@@ -103,7 +103,7 @@ const Register = () => {
         avatar: finalAvatar,
       };
 
-      await axios.post("http://localhost:5000/api/register", userInfo);
+      await axios.post("https://blood-donation-server-iota-flame.vercel.app/api/register", userInfo);
 
       Swal.fire({
         title: "Registration Successful!",
