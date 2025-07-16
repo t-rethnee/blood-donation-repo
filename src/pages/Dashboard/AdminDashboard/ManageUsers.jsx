@@ -8,7 +8,7 @@ const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false); // 🌀 loading state
+  const [loading, setLoading] = useState(false); 
   const usersPerPage = 10;
 
   const auth = getAuth();
