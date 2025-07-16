@@ -42,7 +42,7 @@ const Banner = () => {
         {/* Left Side - Text Content */}
         <div className="flex-1 space-y-6 text-center md:text-left">
           {/* Badge
-          <div className="inline-flex items-center justify-center md:justify-start bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-2 text-white/90 text-sm font-medium">
+          
             <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
            
           </div> */}
