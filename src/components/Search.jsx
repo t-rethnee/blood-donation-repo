@@ -22,7 +22,7 @@ const Search = () => {
       .then((data) => setDistricts(data))
       .catch((err) => console.error("Failed to load districts:", err));
 
-    // Fetch upazilas
+   
     fetch("/data/Upazilas.json")
       .then((res) => res.json())
       .then((data) => setUpazilas(data))
