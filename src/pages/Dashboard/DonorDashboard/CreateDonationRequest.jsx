@@ -106,7 +106,7 @@ const CreateDonationRequest = () => {
     }
   };
 
-  // ✅ Loading while checking user status
+ 
   if (isLoading) {
     return (
       <div className="text-center py-8 text-lg font-medium text-gray-600">
