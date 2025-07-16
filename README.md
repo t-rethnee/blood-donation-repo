@@ -115,3 +115,7 @@ Email is non-editable.
 
 Editable on clicking Edit, saved via Save.
 
+Admin Username : Zannat Zubair
+mail: zannat@gmail.com
+ Password : Zannat@912
+ Live site URL: https://blood-donation-de97b.web.app/
