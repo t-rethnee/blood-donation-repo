@@ -69,7 +69,7 @@ const FundTable = ({ funds }) => {
               <tr key={fund._id} className="hover:bg-gray-50 transition">
                 <td className="px-6 py-4 text-sm text-gray-800">{fund.name || "Unknown"}</td>
                 <td className="px-6 py-4 text-sm text-gray-800">{fund.email || "Unknown"}</td>
-                <td className="px-6 py-4 text-sm font-medium text-green-600">${fund.amount}</td>
+                <td className="px-6 py-4 text-sm font-medium text-green-600">{fund.amount} Tk</td>
                 <td className="px-6 py-4 text-sm text-gray-600">
                   {fund.createdAt ? new Date(fund.createdAt).toLocaleString() : "Unknown Date"}
                 </td>

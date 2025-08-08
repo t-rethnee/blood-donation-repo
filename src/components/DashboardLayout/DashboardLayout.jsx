@@ -17,6 +17,10 @@ const { user: authUser, loading, firebaseUser } = useContext(AuthContext);
   const location = useLocation();
 
   useEffect(() => {
+      document.title = 'RedAid | Dashboard';
+    }, []);
+  
+  useEffect(() => {
   if (!authUser?.email || !firebaseUser) {
     setUser(null);
     return;

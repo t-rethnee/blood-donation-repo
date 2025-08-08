@@ -17,6 +17,10 @@ const DonationRequest = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  useEffect(() => {
+      document.title = 'RedAid | Donation Request';
+    }, []);
+  
 
   useEffect(() => {
     axios

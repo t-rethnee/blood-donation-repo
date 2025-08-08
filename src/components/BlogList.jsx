@@ -16,6 +16,11 @@ const BlogList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
+
+  useEffect(() => {
+      document.title = 'RedAid | Blog';
+    }, []);
+  
   useEffect(() => {
     const fetchPublishedBlogs = async () => {
       try {

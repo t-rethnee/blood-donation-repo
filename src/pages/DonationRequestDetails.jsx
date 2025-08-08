@@ -22,6 +22,13 @@ const DonationRequestDetails = () => {
   const [request, setRequest] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+
+
+useEffect(() => {
+    document.title = 'RedAid | Details Donation Request';
+  }, []);
+
+
   useEffect(() => {
     axios
       .get(`https://blood-donation-server-iota-flame.vercel.app/api/donation-requests/${id}`)

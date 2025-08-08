@@ -11,6 +11,7 @@ const FundingPage = () => {
   const [funds, setFunds] = useState([]);
   const [showCheckout, setShowCheckout] = useState(false);
 
+  
   const fetchFunds = async () => {
     try {
       const res = await axios.get("https://blood-donation-server-iota-flame.vercel.app/fundings");
@@ -19,6 +20,9 @@ const FundingPage = () => {
       console.error("Failed to fetch funding history", error);
     }
   };
+useEffect(() => {
+    document.title = 'RedAid | Funding';
+  }, []);
 
   useEffect(() => {
     fetchFunds();

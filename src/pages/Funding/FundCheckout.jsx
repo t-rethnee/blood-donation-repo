@@ -50,7 +50,7 @@ const FundCheckout = ({ user, amount, onSuccess }) => {
         disabled={!stripe || !clientSecret}
         className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
       >
-        Pay ${amount}
+        Pay {amount} Tk
       </button>
     </form>
   );

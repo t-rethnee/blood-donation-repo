@@ -7,6 +7,10 @@ const BlogDetail = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  useEffect(() => {
+      document.title = 'RedAid | Blog Details';
+    }, []);
+  
 
   useEffect(() => {
     const fetchBlog = async () => {

@@ -84,7 +84,7 @@ const CheckoutForm = ({ user = {}, onSuccess = () => {} }) => {
       className="max-w-md mx-auto p-4 space-y-4 bg-white rounded shadow"
     >
       <div>
-        <label className="block mb-1 font-medium">Amount (USD)</label>
+        <label className="block mb-1 font-medium">Amount (Tk)</label>
         <input
           type="number"
           min={1}
@@ -126,7 +126,7 @@ const CheckoutForm = ({ user = {}, onSuccess = () => {} }) => {
           processing ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
-        {processing ? "Processing..." : `Pay $${amount}`}
+        {processing ? "Processing..." : `Pay Tk ${amount}`}
       </button>
     </form>
   );
