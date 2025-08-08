@@ -62,6 +62,28 @@ const Register = () => {
     }
   };
 
+  // New: Password validation function
+  const validatePassword = (password) => {
+    const minLength = /.{8,}/;
+    const upper = /[A-Z]/;
+    const lower = /[a-z]/;
+    const digit = /[0-9]/;
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (!minLength.test(password))
+      return "Password must be at least 8 characters long.";
+    if (!upper.test(password))
+      return "Password must include at least one uppercase letter.";
+    if (!lower.test(password))
+      return "Password must include at least one lowercase letter.";
+    if (!digit.test(password))
+      return "Password must include at least one number.";
+    if (!specialChar.test(password))
+      return "Password must include at least one special character.";
+
+    return null; // No error
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -76,8 +98,15 @@ const Register = () => {
       confirmPassword,
     } = formData;
 
+    // Check if passwords match
     if (password !== confirmPassword) {
       return setError("Passwords do not match.");
+    }
+
+    // Validate password strength
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return setError(passwordError);
     }
 
     try {
@@ -103,7 +132,10 @@ const Register = () => {
         avatar: finalAvatar,
       };
 
-      await axios.post("https://blood-donation-server-iota-flame.vercel.app/api/register", userInfo);
+      await axios.post(
+        "https://blood-donation-server-iota-flame.vercel.app/api/register",
+        userInfo
+      );
 
       Swal.fire({
         title: "Registration Successful!",
@@ -125,7 +157,10 @@ const Register = () => {
         Register as Donor
       </h2>
 
-      <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form
+        onSubmit={handleRegister}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
         <input
           type="text"
           name="name"
