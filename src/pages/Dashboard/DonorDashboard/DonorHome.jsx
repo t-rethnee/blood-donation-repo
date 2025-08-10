@@ -330,7 +330,7 @@ const DonorHome = () => {
         <div className="text-center text-gray-600 py-16">
           <p>You have not submitted any donation requests yet.</p>
           <Link
-            to="/dashboard/donation-requests/create"
+            to="/dashboard/create-donation-request"
             className="mt-4 inline-block px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition"
           >
             Create Your First Donation Request
